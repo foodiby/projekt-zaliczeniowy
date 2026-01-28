@@ -1,0 +1,31 @@
+name: CI/CD Build and Push
+
+# Wyzwalacz: uruchom przy każdym wypchnięciu kodu do gałęzi main
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    
+    steps:
+      # 1. Pobranie Twojego kodu z repozytorium na maszynę wirtualną
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2. Logowanie do Docker Hub za pomocą Twoich sekretów
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # 3. Budowanie obrazu i wysyłka (push) do sieci
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          # Tutaj używamy Twojej nazwy użytkownika
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/projekt-zaliczeniowy:latest
